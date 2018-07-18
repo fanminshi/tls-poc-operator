@@ -1,0 +1,4 @@
+apiVersion: "security.example.com/v1alpha1"
+kind: "Security"
+metadata:
+  name: "example"
