@@ -4,11 +4,12 @@ import (
 	"context"
 	"runtime"
 
-	stub "github.com/operator-framework/tls-poc-operator/pkg/stub"
+	stub "github.com/fanminshi/tls-poc-operator/pkg/stub"
+
+	"github.com/fanminshi/operator-sdk/pkg/util/tlsutil"
 	sdk "github.com/operator-framework/operator-sdk/pkg/sdk"
 	k8sutil "github.com/operator-framework/operator-sdk/pkg/util/k8sutil"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,6 +33,6 @@ func main() {
 	resyncPeriod := 5
 	logrus.Infof("Watching %s, %s, %s, %d", resource, kind, namespace, resyncPeriod)
 	sdk.Watch(resource, kind, namespace, resyncPeriod)
-	sdk.Handle(stub.NewHandler())
+	sdk.Handle(stub.NewHandler(tlsutil.NewCA()))
 	sdk.Run(context.TODO())
 }

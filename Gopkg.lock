@@ -35,6 +35,12 @@
   version = "v2.8.0"
 
 [[projects]]
+  branch = "tls_util_design"
+  name = "github.com/fanminshi/operator-sdk"
+  packages = ["pkg/util/tlsutil"]
+  revision = "2a853681d04f68c3cf5fb8f41d2cb2cdee1e0f15"
+
+[[projects]]
   name = "github.com/ghodss/yaml"
   packages = ["."]
   revision = "0ca9ea5df5451ffdf184b4428c902747c2c11cd7"
@@ -514,6 +520,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ecd2e1d13a38e943f4705a5b804ae00256c7f741f0eb49211cc498d71278059c"
+  inputs-digest = "207df26a44140e40c2b0e79450a2b02d8fb46d9614d093ef8922b5c1db0d5338"
   solver-name = "gps-cdcl"
   solver-version = 1
