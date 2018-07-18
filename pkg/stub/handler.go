@@ -24,6 +24,7 @@ type Handler struct {
 func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 	switch cr := event.Object.(type) {
 	case *v1alpha1.Security:
+		// Create a simple-server-service that is going to be sit in front the simple server pod.
 		svc := &corev1.Service{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       "Service",
@@ -46,6 +47,7 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 		if err != nil && !apierrors.IsAlreadyExists(err) {
 			return err
 		}
+		// Generate TLS assets based on the svc and CertConfig.
 		se, err := h.ca.GenerateCert(cr, svc, &tlsutil.CertConfig{CertName: "tls"})
 		if err != nil {
 			return err
@@ -68,6 +70,8 @@ func (h *Handler) Handle(ctx context.Context, event sdk.Event) error {
 			return err
 		}
 
+		// Deploy the simple-server using the "quay.io/fanminshi/simple-server:latest" image
+		// and TLS assets generated from the above.
 		replicas := int32(1)
 		de := &v1.Deployment{
 			TypeMeta: metav1.TypeMeta{
