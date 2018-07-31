@@ -4,7 +4,7 @@ The tls-poc-operator tests the TLS utility protype defined in [tls util](https:/
 
 ## Overview
 
-The tlc-poc-operator deploys a [simple-server](https://github.com/fanminshi/simple-server) which is a server that serves a "Hello World" static html page via TLS as Kubernetes pod. The tlc-poc-operator creates the necessary TLS assets, service, and deployment manifests to deploy the simple-server.
+The tlc-poc-operator deploys a [simple-server](https://github.com/fanminshi/simple-server) which is a server that serves a "Hello World" static html page and a simple-client that retrieves the "Hello world" page from the server. The connection between server client is secured via mutal TLS. The tlc-poc-operator also creates the necessary TLS assets, service, and deployment manifests to deploy both the simple-server and the simple-client.
 
 ## Quick Start
 
@@ -15,8 +15,9 @@ $ git clone https://github.com/fanminshi/simple-server.git
 $ cd simple-server
 # Setup the vendor Dependences
 $ dep ensure -v
-# Create the CRD
+# Create the CRD and Custom Resouce.
 $ kubectl create -f deploy/crd.yaml
+$ kubectl create -f deploy/cr.yaml
 # Run the operator locally
 $ OPERATOR_NAME=app-operator operator-sdk up local --namespace=default
 INFO[0000] Go Version: go1.10
@@ -27,15 +28,18 @@ INFO[0000] Watching security.example.com/v1alpha1, Security, default, 5
 # Verify that the deployment is ready
 $ kubectl get deploy
 NAME            DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-simple-server   1         1         1            1           19m
-# Verify that the svc is up. The simple-server-service is used to access the simple-server.
+simple-client   1         1         1            0           20s
+simple-server   1         1         1            1           21s
+# Verify that the svc is up.
+# The simple-server-service is used to access the simple-server.
+# The simple-client-service is a headless service for the client pod. It is used in
+# Clinet Cert's SAN field for the the server to verify the identify of the client.
 $ kubectl get svc
-simple-server-service   ClusterIP   10.96.91.119    <none>        443/TCP     20m
-# Deploy a busy box with curl command in order to access simple-server.
-$ kubectl run curl --image=radial/busyboxplus:curl -i --tty
-# Once gain access, access the secured simple-server-service using curl.
-[ root@curl-545bbf5f9c-f7xtj:/ ]$ curl -k https://simple-server-service
-<!DOCTYPE html>
+simple-client-service   ClusterIP   None             <none>        8080/TCP    21h
+simple-server-service   ClusterIP   10.105.237.227   <none>        8080/TCP    21h
+# Once client and server are deployed, verify that the client is able to get Hello World page from the server.
+$ kubectl logs -f simple-client-586dc44756-hdprr
+2018/07/31 19:19:43 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
